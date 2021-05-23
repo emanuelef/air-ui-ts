@@ -7,6 +7,7 @@ import { StaticMap } from 'react-map-gl';
 import axios from 'axios';
 import { DatePicker, Space } from 'antd';
 import moment from "moment";
+import { Spin } from 'antd';
 
 const { RangePicker } = DatePicker;
 
@@ -68,6 +69,7 @@ const INITIAL_END = 1566361999;
 const LineTracePassages = () => {
   const [passages, setPassages] = useState([] as any);
   const [dateRange, setDateRange] = useState([INITIAL_START, INITIAL_END] as any);
+  const [loading, setLoading] = useState(false);
 
   const layers = [
     new LineLayer({
@@ -101,30 +103,59 @@ const LineTracePassages = () => {
   }
 
   const fetchData = async () => {
-    const result = await axios(
-      `https://now-mongo-api-mudhdoba1-emanuelef.vercel.app/api/passagesPosition.js?start=${dateRange[0]}&end=${dateRange[1]}&interpolation=1`,
-    );
-    console.log(result.data.length);
-    processDataFlights(result.data);
+    setLoading(true)
+    let result = []
+    try {
+      result = await axios(
+        `https://now-mongo-api-mudhdoba1-emanuelef.vercel.app/api/passagesPosition.js?start=${dateRange[0]}&end=${dateRange[1]}&interpolation=1`,
+      );
+    } catch (error) {
+      setLoading(false);
+    } finally {
+      setLoading(false)
+      console.log(result.data.length);
+      processDataFlights(result.data);
+    }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [dateRange]);
 
-  const dateChange = (date, dateString) => {
+  const rangeDateChange = (date, dateString) => {
     console.log(date[0].unix(), date[1].unix())
     console.log(dateString)
     setDateRange([date[0].unix(), date[1].unix()])
-    fetchData()
   }
 
-  return <>
-    <Space direction="vertical" size={12}>
-      <RangePicker
+  const onChange = (date, dateString) => {
+    let start = moment(date)
+      .utc()
+      .startOf("day")
+      .unix();
+    let end = moment(date)
+      .utc()
+      .endOf("day")
+      .unix();
+    setDateRange([start, end])
+  }
+
+  /*
+        <RangePicker
         defaultPickerValue={[moment.unix(INITIAL_START), moment.unix(INITIAL_END)]}
         initialValue={[moment.unix(INITIAL_START), moment.unix(INITIAL_END)]}
-        onChange={dateChange} />
+        onChange={rangeDateChange} />
+        */
+
+  return <>
+    <Space direction="horizontal" size={12}>
+      <DatePicker onChange={onChange}
+        defaultPickerValue={moment.unix(INITIAL_START)}
+        initialValue={moment.unix(INITIAL_START)}
+      />
+      <Spin
+        spinning={loading}
+      />
     </Space>
     <DeckGL width={920} height={580} style={{ left: "200px", top: "164px" }}
       initialViewState={INITIAL_VIEW_STATE}
