@@ -1,0 +1,31 @@
+﻿export interface passages {
+  _id: string;
+  icao: string;
+  op?: string | null;
+  samples: number;
+  startTime: number;
+  startLat: number;
+  startLon: number;
+  startAltitude: number;
+  flyingAtCreation: boolean;
+  speedAtCreation: number;
+  verticalSpeedAtCreation?: number | null;
+  wakeTurbulence: string;
+  from?: string | null;
+  to?: string | null;
+  minDistance: number;
+  minDistanceAccurate: number;
+  minDTimestamp: number;
+  minDAltitude: number;
+  minDLat: number;
+  minDLon: number;
+  timeMinDistanceFromStart: number;
+  endTimeFromStart: number;
+  endLat: number;
+  endLon: number;
+  endAltitude: number;
+  diffAltitude: number;
+  wDeg?: number | null;
+  wSpeed: number;
+  positions?: (number[] | null)[] | null;
+}
