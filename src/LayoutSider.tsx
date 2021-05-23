@@ -12,6 +12,7 @@ import {
 
 import Counter from './Counter'
 import PassagesHistoMap from "./PassagesHistoMap"
+import LineTracePassages from "./LineTracePassages"
 
 const { Header, Sider, Content } = Layout;
 
@@ -59,8 +60,7 @@ export default class SiderDemo extends React.Component {
               minHeight: 280,
             }}
           >
-            <Counter />
-            <PassagesHistoMap />
+            <LineTracePassages />
           </Content>
         </Layout>
       </Layout>

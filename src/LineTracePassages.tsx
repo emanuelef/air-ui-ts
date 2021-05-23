@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DeckGL from '@deck.gl/react';
-import { HexagonLayer } from '@deck.gl/aggregation-layers';
+import { LineLayer } from '@deck.gl/layers';
 import { StaticMap } from 'react-map-gl';
 import axios from 'axios';
 
@@ -40,39 +40,59 @@ const material = {
   specularColor: [51, 51, 51]
 };
 
+const getColor = (d: any) => {
+  const z = d.start[2];
+  const r = z / 2000;
 
-const PassagesHistoMap = () => {
+  return [255 * (1 - r * 2), 255 * r, 128 * r, 125];
+}
+
+const getSourcePosition = (d: any) => {
+  return d.start;
+}
+
+const getTargetPosition = (d: any) => {
+  return d.end;
+}
+
+const LineTracePassages = () => {
   const [passages, setPassages] = useState([] as any);
 
   const layers = [
-    new HexagonLayer({
-      id: "heatmap",
-      //colorRange,
+    new LineLayer({
+      id: "flight-paths",
       coverage: 1,
       data: passages,
-      elevationRange: [0, 800],
-      elevationScale,
-      extruded: true,
-      getPosition: d => d,
-      //onHover: this.props.onHover,
-      opacity: 1,
-      //pickable: Boolean(this.props.onHover),
-      radius: 150,
-      upperPercentile: 100,
-      material
+      fp64: true,
+      getSourcePosition,
+      getTargetPosition,
+      //getColor,
+      getWidth: 4,
+      pickable: true,
     })
   ];
 
   const processDataFlights = (flights: any[]) => {
-    const positions = flights.map((el: { positions: any; }) => el.positions);
-    const renderData = positions.flat().map((el: any[]) => [el[1], el[0]]);
-    setPassages(renderData);
+    let vectors: { start: any[]; end: any[]; timestamp: any; }[] = [];
+    flights.forEach(flight => {
+      let lastPos: { lon: any; lat: any; alt: any; };
+      flight.forEach((element: { lon: any; lat: any; alt: any; timestamp: any; }) => {
+        if (lastPos) {
+          let start = [lastPos.lon, lastPos.lat, lastPos.alt];
+          let end = [element.lon, element.lat, element.alt];
+          let timestamp = element.timestamp;
+          vectors.push({ start, end, timestamp });
+        }
+        lastPos = element;
+      });
+    });
+    setPassages(vectors);
   }
 
   useEffect(() => {
     const fetchData = async () => {
       const result = await axios(
-        'https://now-mongo-api-mudhdoba1-emanuelef.vercel.app/api/allFlights.js?start=1566317600&end=1566361999&interpolation=1',
+        'https://now-mongo-api-mudhdoba1-emanuelef.vercel.app/api/passagesPosition.js?start=1566317600&end=1566361999&interpolation=1',
       );
       console.log(result.data.length);
       processDataFlights(result.data);
@@ -89,4 +109,4 @@ const PassagesHistoMap = () => {
   </DeckGL>
 }
 
-export default PassagesHistoMap
+export default LineTracePassages
