@@ -1,8 +1,15 @@
+// @ts-nocheck
+
 import React, { useState, useEffect } from 'react';
 import DeckGL from '@deck.gl/react';
 import { LineLayer } from '@deck.gl/layers';
 import { StaticMap } from 'react-map-gl';
 import axios from 'axios';
+import { DatePicker, Space } from 'antd';
+import moment from "moment";
+
+const { RangePicker } = DatePicker;
+
 
 const MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoiZW0tZnVtYSIsImEiOiJjazg5ems2ZW0wMHFmM2tvM2U5amx0cGtwIn0.YGYpuq5dr7gd87wGUEiNUQ";
@@ -55,8 +62,12 @@ const getTargetPosition = (d: any) => {
   return d.end;
 }
 
+const INITIAL_START = 1566317600;
+const INITIAL_END = 1566361999;
+
 const LineTracePassages = () => {
   const [passages, setPassages] = useState([] as any);
+  const [dateRange, setDateRange] = useState([INITIAL_START, INITIAL_END] as any);
 
   const layers = [
     new LineLayer({
@@ -66,7 +77,7 @@ const LineTracePassages = () => {
       fp64: true,
       getSourcePosition,
       getTargetPosition,
-      //getColor,
+      getColor,
       getWidth: 4,
       pickable: true,
     })
@@ -89,24 +100,40 @@ const LineTracePassages = () => {
     setPassages(vectors);
   }
 
+  const fetchData = async () => {
+    const result = await axios(
+      `https://now-mongo-api-mudhdoba1-emanuelef.vercel.app/api/passagesPosition.js?start=${dateRange[0]}&end=${dateRange[1]}&interpolation=1`,
+    );
+    console.log(result.data.length);
+    processDataFlights(result.data);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await axios(
-        'https://now-mongo-api-mudhdoba1-emanuelef.vercel.app/api/passagesPosition.js?start=1566317600&end=1566361999&interpolation=1',
-      );
-      console.log(result.data.length);
-      processDataFlights(result.data);
-    };
     fetchData();
   }, []);
 
-  return <DeckGL width={920} height={580} style={{ left: "200px", top: "64px" }}
-    initialViewState={INITIAL_VIEW_STATE}
-    controller={true}
-    layers={layers}
-  >
-    <StaticMap mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} />
-  </DeckGL>
+  const dateChange = (date, dateString) => {
+    console.log(date[0].unix(), date[1].unix())
+    console.log(dateString)
+    setDateRange([date[0].unix(), date[1].unix()])
+    fetchData()
+  }
+
+  return <>
+    <Space direction="vertical" size={12}>
+      <RangePicker
+        defaultPickerValue={[moment.unix(INITIAL_START), moment.unix(INITIAL_END)]}
+        initialValue={[moment.unix(INITIAL_START), moment.unix(INITIAL_END)]}
+        onChange={dateChange} />
+    </Space>
+    <DeckGL width={920} height={580} style={{ left: "200px", top: "164px" }}
+      initialViewState={INITIAL_VIEW_STATE}
+      controller={true}
+      layers={layers}
+    >
+      <StaticMap mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} />
+    </DeckGL>
+  </>
 }
 
 export default LineTracePassages
