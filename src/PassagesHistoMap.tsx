@@ -4,9 +4,6 @@ import { HexagonLayer } from '@deck.gl/aggregation-layers';
 import { StaticMap } from 'react-map-gl';
 import axios from 'axios';
 
-const MAPBOX_ACCESS_TOKEN =
-  "pk.eyJ1IjoiZW0tZnVtYSIsImEiOiJjazg5ems2ZW0wMHFmM2tvM2U5amx0cGtwIn0.YGYpuq5dr7gd87wGUEiNUQ";
-
 // Viewport settings
 const INITIAL_VIEW_STATE = {
   longitude: -0.341004,
@@ -85,7 +82,7 @@ const PassagesHistoMap = () => {
     controller={true}
     layers={layers}
   >
-    <StaticMap mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} />
+    <StaticMap mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN} />
   </DeckGL>
 }
 
