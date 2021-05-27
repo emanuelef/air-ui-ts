@@ -4,12 +4,17 @@ import React, { useState, useEffect } from 'react';
 import DeckGL from '@deck.gl/react';
 import { LineLayer } from '@deck.gl/layers';
 import { StaticMap } from 'react-map-gl';
+import mapboxgl from "mapbox-gl";
 import axios from 'axios';
 import { DatePicker, Space } from 'antd';
 import moment from "moment";
 import { Spin } from 'antd';
 
 const { RangePicker } = DatePicker;
+
+// https://github.com/visgl/react-map-gl/issues/1266
+// eslint-disable-next-line import/no-webpack-loader-syntax
+mapboxgl.workerClass = require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default;
 
 // Viewport settings
 const INITIAL_VIEW_STATE = {
@@ -116,7 +121,6 @@ const LineTracePassages = () => {
 
   useEffect(() => {
     fetchData();
-    console.log(process.env.REACT_APP_MAPBOX_ACCESS_TOKEN)
   }, [dateRange]);
 
   const rangeDateChange = (date, dateString) => {
