@@ -116,6 +116,7 @@ const LineTracePassages = () => {
 
   useEffect(() => {
     fetchData();
+    console.log(process.env.REACT_APP_MAPBOX_ACCESS_TOKEN)
   }, [dateRange]);
 
   const rangeDateChange = (date, dateString) => {
