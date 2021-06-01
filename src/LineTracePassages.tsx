@@ -18,8 +18,10 @@ mapboxgl.workerClass = require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worke
 
 // Viewport settings
 const INITIAL_VIEW_STATE = {
-  longitude: -0.341004,
-  latitude: 51.477487,
+  longitude: -122.380987,
+  latitude: 37.62235,
+  //longitude: -0.341004,
+  //latitude: 51.477487,
   //latitude: 40.641312,
   //longitude: -73.778137,
   zoom: 10,
@@ -64,8 +66,17 @@ const getTargetPosition = (d: any) => {
   return d.end;
 }
 
-const INITIAL_START = 1566317600;
-const INITIAL_END = 1566361999;
+let initialStart = moment(new Date())
+  .utc()
+  .startOf("day")
+  .unix();
+let initialEnd = moment(new Date())
+  .utc()
+  .endOf("day")
+  .unix();
+
+const INITIAL_START = initialStart;
+const INITIAL_END = initialEnd;
 
 const LineTracePassages = () => {
   const [passages, setPassages] = useState([] as any);
@@ -105,7 +116,7 @@ const LineTracePassages = () => {
 
   // https://now-mongo-api-new-45jcfwqs5-emanuelef.vercel.app
   // http://localhost:3000
-  
+
   const fetchData = async () => {
     setLoading(true)
     let result = []
