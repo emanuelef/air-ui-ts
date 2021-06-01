@@ -103,12 +103,15 @@ const LineTracePassages = () => {
     setPassages(vectors);
   }
 
+  // https://now-mongo-api-new-45jcfwqs5-emanuelef.vercel.app
+  // http://localhost:3000
+  
   const fetchData = async () => {
     setLoading(true)
     let result = []
     try {
       result = await axios(
-        `https://now-mongo-api-mudhdoba1-emanuelef.vercel.app/api/passagesPosition.js?start=${dateRange[0]}&end=${dateRange[1]}&interpolation=1`,
+        `https://now-mongo-api-emanuelef.vercel.app/api/passagesPosition.js?start=${dateRange[0]}&end=${dateRange[1]}&interpolation=1`,
       );
     } catch (error) {
       setLoading(false);
