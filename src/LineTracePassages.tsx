@@ -82,6 +82,7 @@ const LineTracePassages = () => {
   const [passages, setPassages] = useState([] as any);
   const [dateRange, setDateRange] = useState([INITIAL_START, INITIAL_END] as any);
   const [loading, setLoading] = useState(false);
+  const [initialView, setInitialView] = useState(INITIAL_VIEW_STATE);
 
   const layers = [
     new LineLayer({
@@ -97,7 +98,26 @@ const LineTracePassages = () => {
     })
   ];
 
+  const average = (nums: number[]) => {
+    return nums.reduce((a, b) => (a + b)) / nums.length;
+  }
+
+  const determineView = (flights: any[]) => {
+    if (flights.length > 0) {
+      setInitialView({
+        longitude: average(flights[flights.length-1].map(flight => flight.lon)),
+        latitude: average(flights[flights.length-1].map(flight => flight.lat)),
+        zoom: 10,
+        minZoom: 7,
+        maxZoom: 18,
+        pitch: 40.5,
+        bearing: -27.396674584323023
+      });
+    }
+  }
+
   const processDataFlights = (flights: any[]) => {
+    determineView(flights)
     let vectors: { start: any[]; end: any[]; timestamp: any; }[] = [];
     flights.forEach(flight => {
       let lastPos: { lon: any; lat: any; alt: any; };
@@ -173,7 +193,7 @@ const LineTracePassages = () => {
       />
     </Space>
     <DeckGL width={920} height={580} style={{ left: "200px", top: "164px" }}
-      initialViewState={INITIAL_VIEW_STATE}
+      initialViewState={initialView}
       controller={true}
       layers={layers}
     >
