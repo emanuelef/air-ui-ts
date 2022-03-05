@@ -1,6 +1,9 @@
 name: Test released version
 
-on: [push, workflow_dispatch]
+on: 
+  schedule:
+   - cron: "0 1 * * *" #runs at 01:00 UTC everyday
+  workflow_dispatch:
 
 jobs:
   test_released_job:
