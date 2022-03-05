@@ -1,0 +1,12 @@
+name: Test released version
+
+on: [push, workflow_dispatch]
+
+jobs:
+  test_released_job:
+    runs-on: ubuntu-latest
+    name: A job to test the latest released ncu-action
+    steps:
+    - name: Test the released step
+      id: test_released
+      uses: fzwael/ncu-action@v1
